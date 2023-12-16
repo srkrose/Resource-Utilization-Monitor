@@ -2,6 +2,7 @@ abusers
 abusers/mailusage
 dnszone
 filecount
+logs
 mail
 serverwatch
 spam
