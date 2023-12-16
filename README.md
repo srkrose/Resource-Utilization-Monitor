@@ -1,2 +1,2 @@
-# Resource-Usage-Monitor
-Resource usage monitoring system for WHM cPanel
+# Resource-Utilization-Monitor
+Resource utilization monitoring system for WHM cPanel
