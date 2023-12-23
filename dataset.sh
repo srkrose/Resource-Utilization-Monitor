@@ -11,5 +11,5 @@ logtime=$(date +"%Y-%m")
 logdate=$(date +"%Y-%m-%d")
 time=$(date +"%F_%T")
 date=$(date +"%F")
-emaillo="test1@domain.com"
-emaillg="test2@domain.com"
+emaillo="test1@domain.tld"
+emaillg="test2@domain.tld"
