@@ -22,9 +22,14 @@ function rmv_backup() {
 
 		if [[ ! -z $backupusage ]]; then
 			while IFS= read -r line; do
-				rm -f "$line"
+				if [[ ! -f "$line" ]]; then
+					rm -f "$line"
 
-				echo "Removed - $line" >>$svrlogs/abusers/remove/$username-rmvbk_$time.txt
+					echo "Removed - $line" >>$svrlogs/abusers/remove/$username-rmvbk_$time.txt
+				else
+					echo "Unavailable - $line" >>$svrlogs/abusers/remove/$username-rmvbk_$time.txt
+				fi
+				
 			done <<<"$backupusage"
 		fi
 	else
