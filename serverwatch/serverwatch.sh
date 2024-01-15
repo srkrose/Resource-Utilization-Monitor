@@ -215,6 +215,22 @@ function check_mailbox() {
 	printf "\n************************************************************\n" >>$svrlogs/serverwatch/serverwatch_$time.txt
 }
 
+function php_inherit() {
+	printf "\n# *** PHP Inherit Check ***\n\n" >>$svrlogs/serverwatch/serverwatch_$time.txt
+
+	sh $scripts/serverwatch/phpinherit.sh
+
+	phpinherit=($(find $svrlogs/serverwatch -type f -name "phpinheritmod*" -exec ls -lat {} + | grep "$(date +"%F_%H:")" | head -1 | awk '{print $NF}'))
+
+	if [[ ! -z $phpinherit ]]; then
+		echo "$(cat $phpinherit)" >>$svrlogs/serverwatch/serverwatch_$time.txt
+	else
+		printf "No new php inherit domains\n" >>$svrlogs/serverwatch/serverwatch_$time.txt
+	fi
+
+	printf "\n************************************************************\n" >>$svrlogs/serverwatch/serverwatch_$time.txt
+}
+
 function send_mail() {
 	sh $scripts/serverwatch/swmail.sh
 }
@@ -242,6 +258,8 @@ abusers_usage
 check_mailbox
 
 mail_block
+
+php_inherit
 
 uptime_check
 
