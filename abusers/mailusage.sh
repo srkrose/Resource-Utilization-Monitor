@@ -22,7 +22,7 @@ function mail_usage() {
 
 				if [[ "$package" == *Unmetered* || "$package" == "WordPress Hosting - G1 - SD - L1" ]]; then
 
-					status=$(whmapi1 accountsummary user=$username | grep -i "outgoing_mail_suspended:" | awk '{print $2}')
+					status=$(whmapi1 accountsummary user=$username | grep -i "outgoing_mail_suspended:" | awk '{print $2}' | sed -e 's/^[[:space:]]*//')
 
 					if [ "$status" -eq 0 ]; then
 						printf "%-12s - %6s M - %-12s - %-70s\n" "$username" "$mail" "Active" "$package" >>$temp/mailusage_$time.txt
