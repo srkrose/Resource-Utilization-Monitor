@@ -5,7 +5,7 @@ source /home/sample/scripts/dataset.sh
 function php_version() {
 	whmapi1 php_get_vhost_versions | grep "version:\|vhost:" | grep -v "version: 1" | awk '{print $NF}' | paste -d' ' - - >>$temp/phpversions_$time.txt
 
-	whmapi1 php_get_vhosts_by_version version=inherit | grep " - " | awk '{ print $NF }' | sort >>$temp/phpinherit_$time.txt
+	whmapi1 php_get_vhosts_by_version version=inherit | grep " - " | awk '{ print $NF }' | sed 's/"//g' | sort >>$temp/phpinherit_$time.txt
 }
 
 function rmv_inherit() {
