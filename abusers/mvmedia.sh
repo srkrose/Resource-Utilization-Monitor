@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /home/rlksvrlogs/scripts/dataset.sh
+source /home/sample/scripts/dataset.sh
 
 input=$1
 
