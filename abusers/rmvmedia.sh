@@ -20,7 +20,7 @@ function rmv_media() {
 	if [ ! -z $fspath ]; then
 		filesharing=$(cat $fspath | awk '{$1=$2=$3=""; print}' | grep -v total$ | sed 's/^[[:space:]]*//')
 
-		if [[ ! -z $filesharing ]]; then
+		if [[ -z $filesharing ]]; then
 			while IFS= read -r line; do
 				if [[ ! -f "$line" ]]; then
 					rm -f "$line"
