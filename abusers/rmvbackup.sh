@@ -22,7 +22,7 @@ function rmv_backup() {
 
 		if [[ ! -z $backupusage ]]; then
 			while IFS= read -r line; do
-				if [[ ! -f "$line" ]]; then
+				if [[ -f "$line" ]]; then
 					rm -f "$line"
 
 					echo "Removed - $line" >>$svrlogs/abusers/remove/$username-rmvbk_$time.txt
