@@ -2,6 +2,7 @@ abusers
 abusers/backupusage
 abusers/mailusage
 abusers/filesharing
+abusers/move
 abusers/remove
 dnszone
 filecount
