@@ -1,5 +1,5 @@
-hostname1:XXX.XXX.XXX.XXX
-hostname1:XXX.XXX.XXX.XXX
+node1:XXX.XXX.XXX.XXX
+node1:XXX.XXX.XXX.XXX
 
-hostname2:XXX.XXX.XXX.XXX
-hostname2:XXX.XXX.XXX.XXX
+node2:XXX.XXX.XXX.XXX
+node2:XXX.XXX.XXX.XXX
