@@ -21,52 +21,96 @@ function check_users() {
 }
 
 function file_sharing() {
-	abuserfs=$(find /home/$username -type f -size +$((1 * 1024 * 1024))c \( -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" -o -name "*.avi" -o -name "*.mov" -o -name "*.ogv" -o -name "*.m4v" -o -name "*.wmv" -o -name "*.flv" -o -name "*.3gp" -o -name "*.mpeg" -o -name "*.mpg" -o -name "*.divx" -o -name "*.mp3" -o -name "*.wav" -o -name "*.aac" -o -name "*.flac" -o -name "*.ogg" -o -name "*.wma" -o -name "*.m4a" -o -name "*.pdf" -o -name "*.doc" -o -name "*.docx" -o -name "*.xls" -o -name "*.xlsx" -o -name "*.ppt" -o -name "*.pptx" -o -name "*.exe" -o -name "*.app" -o -name "*.apk" -o -name "*.deb" -o -name "*.iso" -o -name "*.torrent" -o -name "*.rar" \) ! \( -path "*/cache" -o -path "*/.cpanel/*" -o -path "*/.trash/*" -o -path "*/logs/*" -o -path "*/ssl/*" -o -path "*/tmp/*" \) -exec du -ch --time {} + | sort -rh)
+	abuserfs=$(find /home/$username -type f \( -name "*.png" -o -name "*.PNG" -o -name "*.jpg" -o -name "*.JPG" -o -name "*.jpeg" -o -name "*.bmp" -o -name "*.gif" -o -name "*.tif" -o -name "*.tiff" -o -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" -o -name "*.avi" -o -name "*.mov" -o -name "*.ogv" -o -name "*.m4v" -o -name "*.wmv" -o -name "*.flv" -o -name "*.3gp" -o -name "*.mpeg" -o -name "*.mpg" -o -name "*.divx" -o -name "*.mp3" -o -name "*.wav" -o -name "*.aac" -o -name "*.flac" -o -name "*.ogg" -o -name "*.wma" -o -name "*.m4a" -o -name "*.pdf" -o -name "*.doc" -o -name "*.docx" -o -name "*.xls" -o -name "*.xlsx" -o -name "*.ppt" -o -name "*.pptx" -o -name "*.app" -o -name "*.apk" -o -name "*.deb" -o -name "*.iso" -o -name "*.torrent" -o -name "*.rar" \) ! \( -path "*/cache*" -o -path "*/plugin*" -o -path "*/theme*" -o -path "*/.cpanel/*" -o -path "*/.trash/*" -o -path "*/logs/*" -o -path "*/ssl/*" -o -path "*/tmp/*" -o -path "*/wp-content/*" -o -path "*/lib/*" -o -path "*/src/*" -o -path "*/dist/*" -o -path "*/app/*" -o -path "*assets*" -o -path "*/vendor*" -o -path "*/icons/*" -o -path "*/favicon/*" -o -path "*/resources/*" -o -path "*/libraries/*" -o -path "*/dolibarrdata/*" -o -path "*/css/*" -o -path "*/bootstrap/*" \) -exec du -h --time {} + | awk -F. '{print $NF ": " $0}' | sort)
 
 	if [[ ! -z $abuserfs ]]; then
-		lines=$(echo "$abuserfs" | grep -v total$ | wc -l)
+		extlist=$(echo "$abuserfs" | awk -F":" '{print $1}' | sort | uniq -c | sort -nr)
 
-		head=$(echo "$abuserfs" | grep -v total$ | head -1 | awk '{print $1}')
+		while IFS= read -r line; do
+			extcount=$(echo "$line" | awk '{print $1}')
+			exttype=$(echo "$line" | awk '{print $2}')
 
-		type=${head: -1}
+			data=$(echo "$abuserfs" | awk -v exttype="$exttype" -F":" '{if($1==exttype) print}')
 
-		if [[ $type == "G" ]]; then
-			print_data
+			if [[ $extcount -gt 100 && $exttype != "png" && $exttype != "PNG" && $exttype != "jpg" && $exttype != "JPG" && $exttype != "jpeg" && $exttype != "bmp" && $exttype != "gif" && $exttype != "tif" && $exttype != "tiff" ]]; then
+				echo "$data" >>$temp/$username-fs_$time.txt
 
-		elif [[ $type == "M" ]]; then
-			max=${head:0:${#head}-1}
+			elif [[ $extcount -gt 1000 ]]; then
+				if [[ $exttype == "png" || $exttype == "PNG" || $exttype == "jpg" || $exttype == "JPG" || $exttype == "jpeg" || $exttype == "bmp" || $exttype == "gif" || $exttype == "tif" || $exttype == "tiff" ]]; then
+					size_check
 
-			if [[ $max == *[.]* ]]; then
-				val=${max%.*}
+					if [ -r $temp/$username-$exttype-temp_$time.txt ] && [ -s $temp/$username-$exttype-temp_$time.txt ]; then
+						lcount=$(cat $temp/$username-$exttype-temp_$time.txt | wc -l)
+
+						if [[ $lcount -gt 1000 ]]; then
+							cat $temp/$username-$exttype-temp_$time.txt >>$temp/$username-fs_$time.txt
+						fi
+					fi
+				fi
+
 			else
-				val=$max
+				if [[ $exttype != "png" && $exttype != "PNG" && $exttype != "jpg" && $exttype != "JPG" && $exttype != "jpeg" && $exttype != "bmp" && $exttype != "gif" && $exttype != "tif" && $exttype != "tiff" ]]; then
+					size_check
+
+					if [ -r $temp/$username-$exttype-temp_$time.txt ] && [ -s $temp/$username-$exttype-temp_$time.txt ]; then
+						lcount=$(cat $temp/$username-$exttype-temp_$time.txt | wc -l)
+
+						if [[ $lcount -gt 50 ]]; then
+							echo "$data" >>$temp/$username-fs_$time.txt
+						fi
+					fi
+				fi
 			fi
 
-			if [[ $val -gt 512 || $lines -gt 50 ]]; then
-				print_data
-			fi
-		fi
+		done <<<"$extlist"
+
+		print_data
 	fi
 }
 
+function size_check() {
+	while IFS= read -r dline; do
+		size=$(echo "$dline" | awk '{print $2}')
+		stype=${size: -1}
+
+		if [[ "$stype" == "G" ]]; then
+			echo "$dline" >>$temp/$username-fs_$time.txt
+
+		elif [[ "$stype" == "M" ]]; then
+			nsize=${size:0:${#size}-1}
+
+			if [[ $nsize == *[.]* ]]; then
+				val=${nsize%.*}
+			else
+				val=$nsize
+			fi
+
+			if [[ $val -gt 1 ]]; then
+				echo "$dline" >>$temp/$username-$exttype-temp_$time.txt
+			fi
+		fi
+
+	done <<<"$data"
+}
+
 function print_data() {
-	package=$(whmapi1 accountsummary user=$username | grep -i "plan:" | awk -F':' '{print $2}')
+	if [ -r $temp/$username-fs_$time.txt ] && [ -s $temp/$username-fs_$time.txt ]; then
+		package=$(whmapi1 accountsummary user=$username | grep -i "plan:" | awk -F':' '{print $2}')
 
-	echo "$abuserfs" >>$svrlogs/abusers/filesharing/$username-fs_$time.txt
+		fcount=$(cat $temp/$username-fs_$time.txt | wc -l)
 
-	fcount=$(cat $svrlogs/abusers/filesharing/$username-fs_$time.txt | grep -v total$ | wc -l)
+		cat $temp/$username-fs_$time.txt >>$svrlogs/abusers/filesharing/$username-fs_$time.txt
 
-	capacity=$(cat $svrlogs/abusers/filesharing/$username-fs_$time.txt | grep total$ | awk '{print $1}')
+		ext=$(cat $svrlogs/abusers/filesharing/$username-fs_$time.txt | awk -F":" '{print $1}' | sort | uniq -c | sort -nr | awk '{printf $1" - "$2", "}')
 
-	ext=$(cat $svrlogs/abusers/filesharing/$username-fs_$time.txt | grep -v total$ | awk -F"." '{print $NF}' | sort | uniq -c | sort -nr | awk '{printf $1" - "$2", "}')
+		extension=${ext:0:${#ext}-2}
 
-	extension=${ext:0:${#ext}-2}
+		filedir=$(cat $svrlogs/abusers/filesharing/$username-fs_$time.txt | awk '{$1=$2=$3=""; print}' | awk -F'/' '{print $4}' | sort | uniq -c | sort -nr)
 
-	filedir=$(cat $svrlogs/abusers/filesharing/$username-fs_$time.txt | grep -v total$ | awk '{$1=$2=$3=""; print}' | awk -F'/' '{print $4}' | sort | uniq -c | sort -nr)
-
-	printf "%-12s - %5s - %6s out of %6s M - %-70s\n" "$username" "$fcount" "$capacity" "$usedspace" "$package" >>$temp/filesharing_$time.txt
-	printf "EXTENSION: $extension\n" >>$temp/filesharing_$time.txt
-	printf "FILEDIR: \n$filedir\n\n" >>$temp/filesharing_$time.txt
+		printf "%-12s - %5s - %6s M - %-70s\n" "$username" "$fcount" "$usedspace" "$package" >>$temp/filesharing_$time.txt
+		printf "EXTENSION: $extension\n" >>$temp/filesharing_$time.txt
+		printf "FILEDIR: \n$filedir\n\n" >>$temp/filesharing_$time.txt
+	fi
 }
 
 function file_sharing_sort() {
@@ -86,8 +130,6 @@ function send_mail() {
 }
 
 check_users
-
-file_sharing
 
 file_sharing_sort
 
