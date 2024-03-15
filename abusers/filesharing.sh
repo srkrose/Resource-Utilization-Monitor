@@ -21,7 +21,7 @@ function check_users() {
 }
 
 function file_sharing() {
-	abuserfs=$(find /home/$username -type f \( -name "*.png" -o -name "*.PNG" -o -name "*.jpg" -o -name "*.JPG" -o -name "*.jpeg" -o -name "*.bmp" -o -name "*.gif" -o -name "*.tif" -o -name "*.tiff" -o -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" -o -name "*.avi" -o -name "*.mov" -o -name "*.ogv" -o -name "*.m4v" -o -name "*.wmv" -o -name "*.flv" -o -name "*.3gp" -o -name "*.mpeg" -o -name "*.mpg" -o -name "*.divx" -o -name "*.mp3" -o -name "*.wav" -o -name "*.aac" -o -name "*.flac" -o -name "*.ogg" -o -name "*.wma" -o -name "*.m4a" -o -name "*.pdf" -o -name "*.doc" -o -name "*.docx" -o -name "*.xls" -o -name "*.xlsx" -o -name "*.ppt" -o -name "*.pptx" -o -name "*.app" -o -name "*.apk" -o -name "*.deb" -o -name "*.iso" -o -name "*.torrent" -o -name "*.rar" \) ! \( -path "*/cache*" -o -path "*/plugin*" -o -path "*/theme*" -o -path "*/.cpanel/*" -o -path "*/.trash/*" -o -path "*/logs/*" -o -path "*/ssl/*" -o -path "*/tmp/*" -o -path "*/wp-content/*" -o -path "*/lib/*" -o -path "*/src/*" -o -path "*/dist/*" -o -path "*/app/*" -o -path "*assets*" -o -path "*/vendor*" -o -path "*/icons/*" -o -path "*/favicon/*" -o -path "*/resources/*" -o -path "*/libraries/*" -o -path "*/dolibarrdata/*" -o -path "*/css/*" -o -path "*/bootstrap/*" \) -exec du -h --time {} + | awk -F. '{print $NF ": " $0}' | sort)
+	abuserfs=$(find /home/$username -type f \( -name "*.png" -o -name "*.PNG" -o -name "*.jpg" -o -name "*.JPG" -o -name "*.jpeg" -o -name "*.bmp" -o -name "*.gif" -o -name "*.tif" -o -name "*.tiff" -o -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" -o -name "*.avi" -o -name "*.mov" -o -name "*.ogv" -o -name "*.m4v" -o -name "*.wmv" -o -name "*.flv" -o -name "*.3gp" -o -name "*.mpeg" -o -name "*.mpg" -o -name "*.divx" -o -name "*.mp3" -o -name "*.wav" -o -name "*.aac" -o -name "*.flac" -o -name "*.ogg" -o -name "*.wma" -o -name "*.m4a" -o -name "*.pdf" -o -name "*.doc" -o -name "*.docx" -o -name "*.xlsx" -o -name "*.ppt" -o -name "*.pptx" -o -name "*.app" -o -name "*.apk" -o -name "*.deb" -o -name "*.iso" -o -name "*.torrent" -o -name "*.rar" \) ! \( -path "*/cache*" -o -path "*/plugin*" -o -path "*/theme*" -o -path "*/.cpanel/*" -o -path "*/.trash/*" -o -path "*/logs/*" -o -path "*/ssl/*" -o -path "*/tmp/*" -o -path "*/wp-content/*" -o -path "*/lib/*" -o -path "*/src/*" -o -path "*/dist/*" -o -path "*/app/*" -o -path "*assets*" -o -path "*/vendor*" -o -path "*/icons/*" -o -path "*/favicon/*" -o -path "*/resources/*" -o -path "*/libraries/*" -o -path "*/dolibarrdata/*" -o -path "*/css/*" -o -path "*/bootstrap/*" \) -exec du -h --time {} + | awk -F. '{print $NF ": " $0}' | sort)
 
 	if [[ ! -z $abuserfs ]]; then
 		extlist=$(echo "$abuserfs" | awk -F":" '{print $1}' | sort | uniq -c | sort -nr)
@@ -35,14 +35,14 @@ function file_sharing() {
 			if [[ $extcount -gt 100 && $exttype != "png" && $exttype != "PNG" && $exttype != "jpg" && $exttype != "JPG" && $exttype != "jpeg" && $exttype != "bmp" && $exttype != "gif" && $exttype != "tif" && $exttype != "tiff" ]]; then
 				echo "$data" >>$temp/$username-fs_$time.txt
 
-			elif [[ $extcount -gt 1000 ]]; then
+			elif [[ $extcount -gt 5000 ]]; then
 				if [[ $exttype == "png" || $exttype == "PNG" || $exttype == "jpg" || $exttype == "JPG" || $exttype == "jpeg" || $exttype == "bmp" || $exttype == "gif" || $exttype == "tif" || $exttype == "tiff" ]]; then
 					size_check
 
 					if [ -r $temp/$username-$exttype-temp_$time.txt ] && [ -s $temp/$username-$exttype-temp_$time.txt ]; then
 						lcount=$(cat $temp/$username-$exttype-temp_$time.txt | wc -l)
 
-						if [[ $lcount -gt 1000 ]]; then
+						if [[ $lcount -gt 5000 ]]; then
 							cat $temp/$username-$exttype-temp_$time.txt >>$temp/$username-fs_$time.txt
 						fi
 					fi
@@ -55,7 +55,7 @@ function file_sharing() {
 					if [ -r $temp/$username-$exttype-temp_$time.txt ] && [ -s $temp/$username-$exttype-temp_$time.txt ]; then
 						lcount=$(cat $temp/$username-$exttype-temp_$time.txt | wc -l)
 
-						if [[ $lcount -gt 50 ]]; then
+						if [[ $lcount -gt 20 ]]; then
 							echo "$data" >>$temp/$username-fs_$time.txt
 						fi
 					fi
