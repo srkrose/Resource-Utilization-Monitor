@@ -18,7 +18,7 @@ function rmv_media() {
 	fspath=($(find $svrlogs/abusers/filesharing -type f -name "$username-fs*" -exec ls -lat {} + | head -1 | awk '{print $NF}'))
 
 	if [ ! -z $fspath ]; then
-		filesharing=$(cat $fspath | awk '{$1=$2=$3=""; print}' | grep -v total$ | sed 's/^[[:space:]]*//')
+		filesharing=$(cat $fspath | awk '{$1=$2=$3=$4=""; print}' | grep -v total$ | sed 's/^[[:space:]]*//')
 
 		if [[ ! -z $filesharing ]]; then
 			while IFS= read -r line; do
