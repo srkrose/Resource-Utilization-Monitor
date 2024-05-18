@@ -6,7 +6,7 @@ function file_count() {
 	echo "DATE: $(date +"%F")" >>$svrlogs/filecount/homedir_$time.txt
 	echo "START: $(date +"%T")" >>$svrlogs/filecount/homedir_$time.txt
 
-	fcount=$(find /home -type f -exec ls -lh {} + | wc -l)
+	fcount=$(find /home | wc -l)
 
 	echo "FILE COUNT (/home): $fcount" >>$svrlogs/filecount/homedir_$time.txt
 
